@@ -1,5 +1,5 @@
 [package]
-name = "mana-vcs-tool"
+name = "mana-tool"
 authors = ["rii_125"]
 version = "0.2.0"
 edition = "2024"
