@@ -1,4 +1,4 @@
-# mana
+# Hello mana!
 ![version badge](https://img.shields.io/badge/version-0.1.0-green)
 
 ## What's it?
