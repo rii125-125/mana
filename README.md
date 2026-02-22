@@ -23,6 +23,12 @@ mn
 3. High-speed processing, high-speed execution
 4. Absolutely no pushing to GitHub or similar platforms
 
+## How to Use?
+Install using cargo.
+```bash
+cargo install mana-tool
+```
+
 ## Language
 ![Rust badge](https://img.shields.io/badge/Rust-gray?logo=Rust)
 ![TypeScript Badge](https://img.shields.io/badge/TypeScript-lightblue?logo=Typescript)
