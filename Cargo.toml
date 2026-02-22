@@ -1,7 +1,15 @@
 [package]
-name = "mana"
+name = "mana-tool"
+authors = ["rii_125"]
 version = "0.1.0"
 edition = "2024"
+description = "A simple and intuitive version management tool."
+license = "MIT OR Apache-2.0"
+repository = "https://github.com/rii125-125/mana"
+readme = "README.md"
+keywords = ["vcs", "git", "cli"]
+categories = ["command-line-utilities"]
+
 [[bin]]
 name = "mn"
 path = "src/main.rs"
