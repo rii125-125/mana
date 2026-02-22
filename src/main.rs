@@ -1,15 +1,80 @@
-use clap::Parser;
+use clap::{Parser, Subcommand};
+use std::default;
+use std::fs;
+use std::env;
+use anyhow::Result;
 
 #[derive(Parser)]
 #[command(name = "mn")]
-#[command(about = "A simple version management tool", long_about = None)]
-
 struct Cli {
-
+    #[command(subcommand)]
+    command: Option<Commands>,
 }
 
-fn main() {
-    let _args = Cli::parse();
+#[derive(Subcommand)]
+enum Commands {
+    /// ボックスを初期化する
+    Init {
+        /// ボックスの名前を指定する（省略時は現在のフォルダ名）
+        #[arg(short, long)]
+        name: Option<String>,
+    },
+}
 
-    println!("Hello mana!")
+fn main() -> Result<()> {
+    let cli = Cli::parse();
+
+    match &cli.command {
+        Some(Commands::Init { name }) => {
+            // 名前が決まっていない場合は現在のディレクトリ名を取得
+            let box_name = name.clone().unwrap_or_else(|| {
+                env::current_dir()
+                    .unwrap()
+                    .file_name()
+                    .unwrap()
+                    .to_string_lossy()
+                    .into_owned()
+            });
+
+            // フォルダ作成
+            fs::create_dir_all(".mana/objects")?;
+            fs::create_dir_all(".mana/storage/main")?; // storageの中にmainフォルダ
+            fs::write(".mana/now", "main")?;
+            fs::write(".mana/objects/main", "none")?;
+
+            // .manabox の生成（先ほどのYAML案を書き込む）
+            let default_manabox = r#"file: [
+    "node_modules/",
+    "target/",
+    "out/",
+    ".vscode/",
+    "dist/",
+    "build/",
+    "__pycache__/",
+    ".env",
+    ".DS_Store",
+    "Thumbs.db",
+    ".class",
+    ".log",
+]
+must: [
+    "package.json",
+    "package-lock.json",
+    "Cargo.toml",
+    "Cargo.lock",
+]
+select: [
+    "README.md",
+]
+"#;
+            fs::write(".manabox", default_manabox)?;
+
+            println!("create box \"{}\".", box_name);
+        }
+        None => {
+            println!("Hello mana!");
+        }
+    }
+
+    Ok(())
 }
