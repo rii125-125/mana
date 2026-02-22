@@ -11,6 +11,17 @@ git add src/App.java
 # Think of a commit message for App.java
 git commit -m "Change the type of the `world_population` variable from `int` to `long`"
 ```
+Let's solve these tedious operations with mana.
+```bash
+mn
+> Hello mana!
+```
+
+## What can it do?
+1. Tools that make visualization easy
+2. No complex operations whatsoever
+3. High-speed processing, high-speed execution
+4. Absolutely no pushing to GitHub or similar platforms
 
 ## Language
 ![Rust badge](https://img.shields.io/badge/Rust-gray?logo=Rust)
