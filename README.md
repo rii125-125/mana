@@ -1,5 +1,6 @@
 # Hello mana!
 ![Crates.io Version](https://img.shields.io/crates/v/mana-tool)
+![Crates.io Downloads (latest version)](https://img.shields.io/crates/dv/mana-tool)
 ![Crates.io Size](https://img.shields.io/crates/size/mana-tool)
 ![Crates.io License](https://img.shields.io/crates/l/mana-tool)
 
