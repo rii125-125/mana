@@ -1,5 +1,7 @@
 # Hello mana!
-![version badge](https://img.shields.io/badge/version-0.1.0-green)
+![Crates.io Version](https://img.shields.io/crates/v/mana-tool)
+![Crates.io Size](https://img.shields.io/crates/size/mana-tool)
+![Crates.io License](https://img.shields.io/crates/l/mana-tool)
 
 ## What's it?
 This is a version control tool like Git. It's like Git, but it's not Git. It's a tool that's a little different from traditional version control tools.
