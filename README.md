@@ -32,5 +32,5 @@ cargo install mana-tool
 ```
 
 ## Language
-![Rust badge](https://img.shields.io/badge/Rust-gray?logo=Rust)
+![Rust](https://img.shields.io/badge/rust-v1.70%2B-blue?logo=rust)
 ![TypeScript Badge](https://img.shields.io/badge/TypeScript-lightblue?logo=Typescript)
