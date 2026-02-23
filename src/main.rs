@@ -1,5 +1,4 @@
 use clap::{Parser, Subcommand};
-use std::default;
 use std::fs;
 use std::env;
 use anyhow::Result;
@@ -13,9 +12,9 @@ struct Cli {
 
 #[derive(Subcommand)]
 enum Commands {
-    /// ボックスを初期化する
+    /// Initialize the box
     Init {
-        /// ボックスの名前を指定する（省略時は現在のフォルダ名）
+        /// Specify the box name (default is the current folder name)
         #[arg(short, long)]
         name: Option<String>,
     },
