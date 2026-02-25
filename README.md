@@ -38,3 +38,6 @@ For details, check out the [ROADMAP](ROADMAP.md)!
 ## Language
 ![Rust](https://img.shields.io/badge/rust-v1.70%2B-blue?logo=rust)
 ![TypeScript Badge](https://img.shields.io/badge/TypeScript-lightblue?logo=Typescript)
+
+## Development philosophy
+[Development philosophy](development-philosophy.md)
