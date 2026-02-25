@@ -1,6 +1,7 @@
 use clap::{Parser, Subcommand};
 use std::fs;
 use std::env;
+use std::path::Path;
 use anyhow::Result;
 
 #[derive(Parser)]
@@ -25,24 +26,41 @@ fn main() -> Result<()> {
 
     match &cli.command {
         Some(Commands::Init { name }) => {
-            // 名前が決まっていない場合は現在のディレクトリ名を取得
-            let box_name = name.clone().unwrap_or_else(|| {
-                env::current_dir()
-                    .unwrap()
-                    .file_name()
-                    .unwrap()
-                    .to_string_lossy()
-                    .into_owned()
-            });
+            init_mana(name)?;
+        }
+        None => {
+            println!("Hello mana!");
+        }
+    }
+    Ok(())
+}
 
-            // フォルダ作成
-            fs::create_dir_all(".mana/objects")?;
-            fs::create_dir_all(".mana/storage/main")?; // storageの中にmainフォルダ
-            fs::write(".mana/now", "main")?;
-            fs::write(".mana/objects/main", "none")?;
+fn init_mana(name: &Option<String>) -> Result<()> {
+    // 1. ボックス名の決定
+    let box_name = name.clone().unwrap_or_else(|| {
+        env::current_dir()
+            .unwrap()
+            .file_name()
+            .unwrap()
+            .to_string_lossy()
+            .into_owned()
+    });
+    // 2. .mana ディレクトリの作成（既存チェック付き）
+    if Path::new(".mana").exists() {
+        println!("⚠️ mana: A box (.mana) already exists.");
+    } else {
+        fs::create_dir_all(".mana/objects")?;
+        fs::create_dir_all(".mana/storage/main")?;
+        fs::write(".mana/now", "main")?;
+        fs::write(".mana/objects/main", "none")?;
+        println!("✨ create box \"{}\".", box_name);
+    }
 
-            // .manabox の生成（先ほどのYAML案を書き込む）
-            let default_manabox = r#"file: [
+    // 3. .manabox の作成（上書き防止ガード）
+    if Path::new(".manabox").exists() {
+        println!("✋ mana: Since '.manabox' already exists, creation was skipped.");
+    } else {
+        let default_manabox = r#"file: [
     "node_modules/",
     "target/",
     "out/",
@@ -66,13 +84,8 @@ select: [
     "README.md",
 ]
 "#;
-            fs::write(".manabox", default_manabox)?;
-
-            println!("create box \"{}\".", box_name);
-        }
-        None => {
-            println!("Hello mana!");
-        }
+        fs::write(".manabox", default_manabox)?;
+        println!("📄 A new '.manabox' has been created.");
     }
 
     Ok(())
