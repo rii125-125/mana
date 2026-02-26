@@ -2,7 +2,7 @@
 ![Crates.io Version](https://img.shields.io/crates/v/mana-tool)
 ![Crates.io Downloads (latest version)](https://img.shields.io/crates/dv/mana-tool)
 ![Crates.io Size](https://img.shields.io/crates/size/mana-tool)
-![Crates.io License](https://img.shields.io/crates/l/mana-tool)
+![Crates.io License](https://img.shields.io/crates/l/mana-tool?link=https%3A%2F%2Fcrates.io%2Fcrates%2Fmana-tool)
 
 ## What's it?
 This is a version control tool like Git. It's like Git, but it's not Git. It's a tool that's a little different from traditional version control tools.
