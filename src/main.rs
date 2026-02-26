@@ -1,3 +1,7 @@
+mod process;
+
+use process::ManaboxConfig;
+
 use clap::{Parser, Subcommand};
 use std::fs;
 use std::env;
@@ -31,6 +35,11 @@ fn main() -> Result<()> {
         None => {
             println!("Hello mana!");
         }
+    }
+
+    // テスト呼び出し
+    if let Ok(config) = ManaboxConfig::load() {
+        println!("Config loaded from process.rs: {:?}", config);
     }
     Ok(())
 }
