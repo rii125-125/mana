@@ -32,6 +32,10 @@ Install using cargo.
 cargo install mana-tool
 ```
 
+## mana terminology
+This is terminology used in mana.<br/>
+[English](manaTerminology/(en)mana-terminology.md) | [French](manaTerminology/(fr)mana-terminology.md) | [Japanese](manaTerminology/(jp)mana-terminology.md)
+
 ## ROADMAP
 For details, check out the [ROADMAP](ROADMAP.md)!
 
