@@ -21,7 +21,7 @@ mn
 ```
 
 ## What can it do?
-1. Tools that make visualization easy
+1. A tool that makes it easy to visualize
 2. No complex operations whatsoever
 3. High-speed processing, high-speed execution
 4. Absolutely no pushing to GitHub or similar platforms
