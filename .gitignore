@@ -1,4 +1,8 @@
+# folders
 /.vscode
 /target
+/rules
+
+# files
 guid.md
 specifications.md
