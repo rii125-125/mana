@@ -1,11 +1,11 @@
 [package]
 name = "mana-tool"
 authors = ["rii_125"]
-version = "0.4.2"
+version = "0.4.3"
 edition = "2024"
 description = "A simple and intuitive version management tool."
 license = "MIT"
-repository = "https://github.com/rii125-125/mana"
+repository = "https://github.com/rii125-125/mana-tool"
 readme = "README.md"
 keywords = ["vcs", "git", "cli"]
 categories = ["command-line-utilities"]
