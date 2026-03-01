@@ -3,6 +3,8 @@ use std::fs;
 use std::env;
 use std::path::Path;
 use anyhow::Result;
+use walkdir::WalkDir;
+use std::collections::HashSet;
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct ManaboxConfig {
@@ -74,6 +76,45 @@ select: [
 "#;
         fs::write(".manabox", default_manabox)?;
         println!("📄 A new '.manabox' has been created.");
+    }
+
+    Ok(())
+}
+
+// Add this to your existing ManaboxConfig struct or as a standalone function
+/// Scans the current directory and categorizes files based on .manabox rules.
+pub fn scan_workspace(config: &ManaboxConfig) -> Result<()> {
+    println!("🔍 Scanning workspace...");
+
+    // Convert config lists to HashSets for faster lookup
+    let ignore_set: HashSet<_> = config.file.iter().collect();
+    let must_set: HashSet<_> = config.must.iter().collect();
+    let select_set: HashSet<_> = config.select.iter().collect();
+
+    // Iterate through all files in the current directory
+    for entry in WalkDir::new(".")
+        .into_iter()
+        .filter_map(|e| e.ok()) // Ignore broken links or permission errors
+    {
+        let path = entry.path();
+        // Skip the .mana directory itself to avoid infinite loops/unnecessary data
+        if path.starts_with("./.mana") || path.to_str() == Some(".") {
+            continue;
+        }
+
+        if path.is_file() {
+            let file_name = path.file_name().unwrap().to_string_lossy();
+            // Simple logic for classification (This will be improved later)
+            if ignore_set.contains(&file_name.to_string()) {
+                println!("  [Ignore] {:?}", path);
+            } else if must_set.contains(&file_name.to_string()) {
+                println!("  [Must  ] {:?}", path);
+            } else if select_set.contains(&file_name.to_string()) {
+                println!("  [Select] {:?}", path);
+            } else {
+                println!("  [Other ] {:?}", path);
+            }
+        }
     }
 
     Ok(())

@@ -33,10 +33,10 @@ fn main() -> Result<()> {
             println!("Hello mana!");
             // Check if .manabox exists and show debug info for development
             if let Ok(config) = ManaboxConfig::load() {
-                println!("Config loaded successfully:");
-                println!("  File:  {:?}", config.file);
-                println!("  Must:  {:?}", config.must);
-                println!("  Select:  {:?}", config.select);
+                // New scan function!
+                process::scan_workspace(&config)?;
+            } else {
+                println!("⚠️ No .manabox found. Please run 'mn init' first.");
             }
         }
     }
