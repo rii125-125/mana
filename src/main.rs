@@ -33,7 +33,7 @@ fn main() -> Result<()> {
             println!("Hello mana!");
             // Check if .manabox exists and show debug info for development
             if let Ok(config) = ManaboxConfig::load() {
-                println!("Config loaded successfully: {:?}", config);
+                println!("Config loaded successfully: {:?}\n{:?}\n{:?}", config.file, config.must, config.select);
             }
         }
     }
