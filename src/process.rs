@@ -141,10 +141,11 @@ mod tests {
     use tempfile::NamedTempFile;
 
     #[test]
-    fn test_calculate_hash() -> Result<()> {
+    fn test_calculate_hash() -> anyhow::Result<()> {
         // 1. Create a temporary file
         let mut tmpfile = NamedTempFile::new()?;
         write!(tmpfile, "hello mana")?;
+        tmpfile.flush()?;
 
         // 2. Calculate hash
         let hash = calculate_hash(tmpfile.path())?;
