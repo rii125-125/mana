@@ -30,15 +30,16 @@ fn main() -> Result<()> {
             init_mana(name)?;
         }
         None => {
-            println!("Hello mana!");
-            // Check if .manabox exists and show debug info for development
-            if let Ok(config) = ManaboxConfig::load() {
-                // New scan function!
-                process::scan_workspace(&config)?;
-            } else {
-                println!("⚠️ No .manabox found. Please run 'mn init' first.");
-            }
+    println!("Hello mana!");
+    if let Ok(config) = ManaboxConfig::load() {
+        let snapshot = process::scan_workspace(&config)?;
+        println!("✅ Snapshot created with {} files.", snapshot.files.len());
+        // Optionally: Print one for a quick check
+        if let Some((path, hash)) = snapshot.files.iter().next() {
+            println!("Example: {} -> {}", path, &hash[..8]); // Show first 8 chars of hash
         }
+    }
+}
     }
 
     Ok(())
