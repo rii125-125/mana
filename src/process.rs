@@ -5,12 +5,21 @@ use std::path::Path;
 use anyhow::Result;
 use walkdir::WalkDir;
 use std::collections::HashSet;
+use sha2::{Sha256, Digest};
+use std::io::{self, Read};
+use std::collections::HashMap;
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct ManaboxConfig {
     pub file: Vec<String>,
     pub must: Vec<String>,
     pub select: Vec<String>,
+}
+
+/// Represents a snapshot of the workspace files and their hashes.
+#[derive(Debug)]
+pub struct FileSnapshot {
+    pub files: HashMap<String, String>, // Key: Relative Path, Value: Hash
 }
 
 impl ManaboxConfig {
@@ -82,42 +91,68 @@ select: [
 }
 
 // Add this to your existing ManaboxConfig struct or as a standalone function
-/// Scans the current directory and categorizes files based on .manabox rules.
-pub fn scan_workspace(config: &ManaboxConfig) -> Result<()> {
-    println!("🔍 Scanning workspace...");
+/// Scans the workspace and returns a FileSnapshot containing hashes of all relevant files.
+pub fn scan_workspace(config: &ManaboxConfig) -> Result<FileSnapshot> {
+    println!("🔍 Scanning and hashing files...");
+    let mut files = HashMap::new();
 
-    // Convert config lists to HashSets for faster lookup
-    // Hint: Remove trailing slashes for easier comparison
     let ignore_set: HashSet<String> = config.file.iter().map(|s| s.trim_end_matches('/').to_string()).collect();
-    let must_set: HashSet<_> = config.must.iter().collect();
-    let select_set: HashSet<_> = config.select.iter().collect();
 
-    let walker = WalkDir::new(".").into_iter();
-
-    for entry in walker.filter_entry(|e| {
-        // Efficiency: If the directory is in the ignore list, don't even enter it!
-        let name = e.file_name().to_string_lossy();
-        if name == ".mana" || ignore_set.contains(&name.to_string()) {
-            return false; // Skip this directory entirely
-        }
-        true
-    }) {
-        let entry = entry?;
+    for entry in WalkDir::new(".")
+        .into_iter()
+        .filter_entry(|e| {
+            let name = e.file_name().to_string_lossy();
+            name != ".mana" && !ignore_set.contains(&name.to_string())
+        })
+        .filter_map(|e| e.ok()) 
+    {
         let path = entry.path();
-
         if path.is_file() {
-            let file_name = path.file_name().unwrap().to_string_lossy().to_string();
-            // Classification logic
-            if must_set.contains(&file_name) {
-                println!("  [Must  ] {:?}", path);
-            } else if select_set.contains(&file_name) {
-                println!("  [Select] {:?}", path);
-            } else {
-                // If it's not ignored (already filtered) and not Must/Select, it's Other
-                println!("  [Other ] {:?}", path);
-            }
+            // Calculate the hash for each file found
+            let hash = calculate_hash(path)?;
+            let path_str = path.to_string_lossy().to_string();
+            files.insert(path_str, hash);
         }
     }
 
-    Ok(())
+    Ok(FileSnapshot { files })
+}
+
+/// Calculates the SHA-256 hash of a file.
+/// This is the "fingerprint" of the file content.
+pub fn calculate_hash(path: &std::path::Path) -> Result<String> {
+    let mut file = fs::File::open(path)?;
+    let mut hasher = Sha256::new();
+    let mut buffer = [0; 1024]; // Read in chunks for efficiency
+
+    loop {
+        let count = file.read(&mut buffer)?;
+        if count == 0 { break; }
+        hasher.update(&buffer[..count]);
+    }
+
+    Ok(hex::encode(hasher.finalize()))
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use std::io::Write;
+    use tempfile::NamedTempFile;
+
+    #[test]
+    fn test_calculate_hash() -> Result<()> {
+        // 1. Create a temporary file
+        let mut tmpfile = NamedTempFile::new()?;
+        write!(tmpfile, "hello mana")?;
+
+        // 2. Calculate hash
+        let hash = calculate_hash(tmpfile.path())?;
+
+        // 3. SHA-256 of "hello mana"
+        // echo -n "hello mana" | shasum -a 256
+        let expected = "274a7732296c09819970921a8d0034606f2e8f19293114d2e057388716399676";
+        assert_eq!(hash, expected);
+        Ok(())
+    }
 }
