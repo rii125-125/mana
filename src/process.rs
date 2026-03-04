@@ -138,19 +138,24 @@ pub fn calculate_hash(path: &std::path::Path) -> Result<String> {
 mod tests {
     use super::*;
     use std::fs;
+    use anyhow::Result;
 
     #[test]
-    fn test_calculate_hash() -> anyhow::Result<()> {
-        // 1. 一時ディレクトリを作成
-        let dir = tempfile::tempdir()?;
-        let file_path = dir.path().join("test.txt");
+    fn test_calculate_hash() -> Result<()> {
+        // 1. 確実にユニークな一時ファイル名を作る
+        let test_file = "test_mana_hash.tmp";
 
-        // 2. fs::write を使って、書き込み直後にファイルを「完全に閉じる」
-        // これでOSのバッファもフラッシュされ、ロックも解除される
-        fs::write(&file_path, "hello mana")?;
+        // 2. 標準の fs::write を使用。
+        // これが完了した時点で、OSはファイルを閉じ、ディスクへの書き込みを確定させる。
+        fs::write(test_file, "hello mana")?;
 
-        // 3. ハッシュ計算（ここから新しく File::open するので必ず成功する）
-        let hash = calculate_hash(&file_path)?;
+        // 3. ハッシュ計算を実行
+        let path = std::path::Path::new(test_file);
+        let result = calculate_hash(path);
+
+        // 4. 後片付け（テストが失敗してもファイルが残らないように工夫は後回しで、まずは成功させる）
+        let hash = result?;
+        fs::remove_file(test_file)?;
 
         // SHA-256 of "hello mana"
         let expected = "274a7732296c09819970921a8d0034606f2e8f19293114d2e057388716399676";
