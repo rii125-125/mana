@@ -137,22 +137,24 @@ pub fn calculate_hash(path: &std::path::Path) -> Result<String> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use std::io::Write;
-    use tempfile::NamedTempFile;
+    use std::fs;
 
     #[test]
     fn test_calculate_hash() -> anyhow::Result<()> {
-        // 1. Create a temporary file
-        let mut tmpfile = NamedTempFile::new()?;
-        write!(tmpfile, "hello mana")?;
-        tmpfile.flush()?;
+        // 1. 一時ディレクトリを作成
+        let dir = tempfile::tempdir()?;
+        let file_path = dir.path().join("test.txt");
 
-        // 2. Calculate hash
-        let hash = calculate_hash(tmpfile.path())?;
+        // 2. fs::write を使って、書き込み直後にファイルを「完全に閉じる」
+        // これでOSのバッファもフラッシュされ、ロックも解除される
+        fs::write(&file_path, "hello mana")?;
 
-        // 3. SHA-256 of "hello mana"
-        // echo -n "hello mana" | shasum -a 256
+        // 3. ハッシュ計算（ここから新しく File::open するので必ず成功する）
+        let hash = calculate_hash(&file_path)?;
+
+        // SHA-256 of "hello mana"
         let expected = "274a7732296c09819970921a8d0034606f2e8f19293114d2e057388716399676";
+        
         assert_eq!(hash, expected);
         Ok(())
     }
