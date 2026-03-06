@@ -104,7 +104,7 @@ pub fn scan_workspace(config: &ManaboxConfig) -> Result<FileSnapshot> {
             let name = e.file_name().to_string_lossy();
             name != ".mana" && !ignore_set.contains(&name.to_string())
         })
-        .filter_map(|e| e.ok()) 
+        .filter_map(|e| e.ok())
     {
         let path = entry.path();
         if path.is_file() {
