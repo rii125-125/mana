@@ -125,18 +125,14 @@ pub fn calculate_hash(path: &std::path::Path) -> Result<String> {
     let mut hasher = Sha256::new();
     let mut buffer = [0; 1024]; // Read in chunks for efficiency
 
-    loop {
-        let count = file.read(&mut buffer)?;
-        if count == 0 { break; }
-        hasher.update(&buffer[..count]);
-    }
+    std::io::copy(&mut file, &mut hasher)?;
 
     Ok(hex::encode(hasher.finalize()))
 }
 
 #[cfg(test)]
 mod tests {
-    use super::*;
+    use crate::process::calculate_hash;
     use std::fs;
     use anyhow::Result;
 
