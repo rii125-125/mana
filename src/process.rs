@@ -104,7 +104,7 @@ pub fn scan_workspace(config: &ManaboxConfig) -> Result<FileSnapshot> {
             let name = e.file_name().to_string_lossy();
             name != ".mana" && !ignore_set.contains(&name.to_string())
         })
-        .filter_map(|e| e.ok()) 
+        .filter_map(|e| e.ok())
     {
         let path = entry.path();
         if path.is_file() {
@@ -125,34 +125,37 @@ pub fn calculate_hash(path: &std::path::Path) -> Result<String> {
     let mut hasher = Sha256::new();
     let mut buffer = [0; 1024]; // Read in chunks for efficiency
 
-    loop {
-        let count = file.read(&mut buffer)?;
-        if count == 0 { break; }
-        hasher.update(&buffer[..count]);
-    }
+    std::io::copy(&mut file, &mut hasher)?;
 
     Ok(hex::encode(hasher.finalize()))
 }
 
 #[cfg(test)]
 mod tests {
-    use super::*;
-    use std::io::Write;
-    use tempfile::NamedTempFile;
+    use crate::process::calculate_hash;
+    use std::fs;
+    use anyhow::Result;
 
     #[test]
-    fn test_calculate_hash() -> anyhow::Result<()> {
-        // 1. Create a temporary file
-        let mut tmpfile = NamedTempFile::new()?;
-        write!(tmpfile, "hello mana")?;
-        tmpfile.flush()?;
+    fn test_calculate_hash() -> Result<()> {
+        // 1. 確実にユニークな一時ファイル名を作る
+        let test_file = "test_mana_hash.tmp";
 
-        // 2. Calculate hash
-        let hash = calculate_hash(tmpfile.path())?;
+        // 2. 標準の fs::write を使用。
+        // これが完了した時点で、OSはファイルを閉じ、ディスクへの書き込みを確定させる。
+        fs::write(test_file, "hello mana")?;
 
-        // 3. SHA-256 of "hello mana"
-        // echo -n "hello mana" | shasum -a 256
+        // 3. ハッシュ計算を実行
+        let path = std::path::Path::new(test_file);
+        let result = calculate_hash(path);
+
+        // 4. 後片付け（テストが失敗してもファイルが残らないように工夫は後回しで、まずは成功させる）
+        let hash = result?;
+        fs::remove_file(test_file)?;
+
+        // SHA-256 of "hello mana"
         let expected = "274a7732296c09819970921a8d0034606f2e8f19293114d2e057388716399676";
+        
         assert_eq!(hash, expected);
         Ok(())
     }
